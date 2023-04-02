@@ -1,15 +1,14 @@
 //EJECUTAMOS EL CONTENEDOR
-docker run --rm -it -v hadoop-data:/source -p 50070-50080:50070-50080 sequenceiq/hadoop-docker /etc/bootstrap.sh -bash
 docker run --rm -it -v Practica2:/source -p 50070-50080:50070-50080 sequenceiq/hadoop-docker /etc/bootstrap.sh -bash
 
 //CREAMOS LA CARPETA DE LOS ARCHIVOS
 mkdir Archivos
 
-docker cp "C:/Users/pdani/Desktop/USAC/Segundo Semestre 2022/Seminario 2/Practica2/data/input/Correos.txt" beautiful_kepler:/Archivos
+docker cp "Correos.txt" 8d6:/Archivos
 
-docker cp "C:/Users/pdani/Desktop/USAC/Segundo Semestre 2022/Seminario 2/Practica2/data/input/Puntuacion.txt" quizzical_sanderson:/Archivos
+docker cp "Puntuacion.txt" 8d6:/Archivos
 
-docker cp "C:/Users/pdani/Desktop/USAC/Segundo Semestre 2022/Seminario 2/Practica2/data/input/WordCount.java" quizzical_sanderson:/Archivos
+docker cp "WordCount.java" 8d6:/Archivos
 
 //INICIALIZAR VARIABLE
 
