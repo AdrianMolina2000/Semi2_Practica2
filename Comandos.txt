@@ -1,0 +1,80 @@
+//EJECUTAMOS EL CONTENEDOR
+docker run --rm -it -v hadoop-data:/source -p 50070-50080:50070-50080 sequenceiq/hadoop-docker /etc/bootstrap.sh -bash
+docker run --rm -it -v Practica2:/source -p 50070-50080:50070-50080 sequenceiq/hadoop-docker /etc/bootstrap.sh -bash
+
+//CREAMOS LA CARPETA DE LOS ARCHIVOS
+mkdir Archivos
+
+docker cp "C:/Users/pdani/Desktop/USAC/Segundo Semestre 2022/Seminario 2/Practica2/data/input/Correos.txt" beautiful_kepler:/Archivos
+
+docker cp "C:/Users/pdani/Desktop/USAC/Segundo Semestre 2022/Seminario 2/Practica2/data/input/Puntuacion.txt" quizzical_sanderson:/Archivos
+
+docker cp "C:/Users/pdani/Desktop/USAC/Segundo Semestre 2022/Seminario 2/Practica2/data/input/WordCount.java" quizzical_sanderson:/Archivos
+
+//INICIALIZAR VARIABLE
+
+export HADOOP_HOME=/usr/local/hadoop
+
+export CLASSPATH="$HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.7.0.jar:$HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-client-common-2.7.0.jar:$HADOOP_HOME/share/hadoop/common/hadoop-common-2.7.0.jar:/Archivos/*:$HADOOP_HOME/lib/*"
+
+// COMPILAR EL .JAR
+javac -d . WordCount.java
+
+// CREAR ARCHIVOS M
+cat > Manifest.txt
+//CONTENIDO
+Main-class: WordCount
+
+// PARA GUARDAR CRTL + D
+
+// VERIFICAR CONTENIDO
+cat Manifest.txt
+
+
+//CREAR EL .JAR, ARCHIVO PARA CONTAR LAS PALABRAS
+jar cfm WordCount.jar Manifest.txt *.class
+
+//Comando para crear la carpeta de entrada y salida en el home del usuario root
+mkdir ~/input
+mkdir ~/output
+
+//COPIAR ARCHIVOS DE ENTRADAS EN EL USUARIO ROOT
+
+cp Correos.txt ~/input
+cp Puntuacion.txt ~/input
+
+ls ~/input
+
+//COPIAR ARCHIVOS AL SISTEMA DE ARCHIVOS DE HADOOP, (HDFS)
+${HADOOP_HOME}/bin/hdfs dfs -copyFromLocal ~/input /
+
+//Comando para verificar los archivos que copiamos al sistema de archivos de Hadoop
+${HADOOP_HOME}/bin/hdfs dfs -ls /input
+
+//Comando para realizar el conteo de palabras
+${HADOOP_HOME}/bin/hadoop jar WordCount.jar /input /output
+
+//Comando para ver los archivos de salida
+${HADOOP_HOME}/bin/hdfs dfs -ls /output
+
+//Comando para ver el archivo de salida
+${HADOOP_HOME}/bin/hdfs dfs -cat /output/part-r-00000
+
+//Comando para cambiar el nombre del archivo de conteo
+${HADOOP_HOME}/bin/hdfs dfs -mv /output/part-r-00000 /output/Resultado_Puntuacion.txt
+
+//Comando para ver el archivo de salida renombrado
+${HADOOP_HOME}/bin/hdfs dfs -cat /output/Resultado_Puntuacion.txt
+
+//Comando para copiar el archivo de salida a carpeta de salida del home del usuario root
+${HADOOP_HOME}/bin/hdfs dfs -copyToLocal /output/Resultado_Puntuacion.txt ~/output
+
+//Comando para mover el archivo de salida a la carpeta Ejemplo del contenedor
+cp ~/output/Resultado_Puntuacion.txt /Archivos
+
+
+docker cp quizzical_sanderson:Archivos/Resultado_Puntuacion.txt "C:/Users/pdani/Desktop/USAC/Segundo Semestre 2022/Seminario 2/Practica2/data/output"
+
+
+
+
